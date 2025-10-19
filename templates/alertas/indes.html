@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Alertas - Integra+ Estoque{% endblock %}
+
+{% block content %}
+<div class="space-y-6 mb-20 md:mb-0">
+    <div>
+        <h1 class="text-3xl font-bold">Alertas</h1>
+        <p class="text-muted-foreground">Monitore situações que requerem atenção</p>
+    </div>
+
+     Resumo de Alertas 
+    <div class="bg-card border border-border rounded-lg p-6">
+        <div class="flex items-center gap-4">
+            <span class="text-5xl">🔔</span>
+            <div>
+                <p class="text-sm text-muted-foreground">Total de Alertas Ativos</p>
+                <p class="text-4xl font-bold text-yellow-500">{{ total_alertas }}</p>
+            </div>
+        </div>
+    </div>
+
+     Produtos Sem Estoque 
+    {% if produtos_sem_estoque %}
+    <div class="bg-card border border-red-500 rounded-lg p-6">
+        <h2 class="text-xl font-semibold mb-4 flex items-center gap-2 text-red-500">
+            <span>🚨</span>
+            Produtos Sem Estoque ({{ produtos_sem_estoque|length }})
+        </h2>
+        <div class="space-y-3">
+            {% for produto in produtos_sem_estoque %}
+            <div class="flex items-center justify-between p-4 bg-red-500/20 rounded-lg">
+                <div>
+                    <p class="font-medium">{{ produto.nome }}</p>
+                    <p class="text-sm text-muted-foreground">{{ produto.marca.nome }} - SKU: {{ produto.sku }}</p>
+                </div>
+                <a href="/produtos/{{ produto.id }}" class="px-4 py-2 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600 transition-colors">
+                    Ver Produto
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+     Produtos com Estoque Baixo 
+    {% if produtos_baixo_estoque %}
+    <div class="bg-card border border-yellow-500 rounded-lg p-6">
+        <h2 class="text-xl font-semibold mb-4 flex items-center gap-2 text-yellow-500">
+            <span>⚠️</span>
+            Produtos com Estoque Baixo ({{ produtos_baixo_estoque|length }})
+        </h2>
+        <div class="space-y-3">
+            {% for produto in produtos_baixo_estoque %}
+            <div class="flex items-center justify-between p-4 bg-yellow-500/20 rounded-lg">
+                <div>
+                    <p class="font-medium">{{ produto.nome }}</p>
+                    <p class="text-sm text-muted-foreground">
+                        {{ produto.marca.nome }} - Estoque: {{ produto.quantidade_estoque }} / Mínimo: {{ produto.estoque_minimo }}
+                    </p>
+                </div>
+                <a href="/produtos/{{ produto.id }}" class="px-4 py-2 bg-yellow-500 text-black rounded-lg text-sm hover:bg-yellow-600 transition-colors">
+                    Ver Produto
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+     Produtos Vencidos 
+    {% if produtos_vencidos %}
+    <div class="bg-card border border-red-500 rounded-lg p-6">
+        <h2 class="text-xl font-semibold mb-4 flex items-center gap-2 text-red-500">
+            <span>❌</span>
+            Produtos Vencidos ({{ produtos_vencidos|length }})
+        </h2>
+        <div class="space-y-3">
+            {% for mov in produtos_vencidos %}
+            <div class="flex items-center justify-between p-4 bg-red-500/20 rounded-lg">
+                <div>
+                    <p class="font-medium">{{ mov.produto.nome }}</p>
+                    <p class="text-sm text-muted-foreground">
+                        Lote: {{ mov.lote or 'N/A' }} - Vencido em {{ mov.validade.strftime('%d/%m/%Y') }}
+                    </p>
+                </div>
+                <span class="px-3 py-1 bg-red-500 text-white rounded-full text-sm">
+                    {{ mov.quantidade }} un.
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+     Produtos Próximos do Vencimento 
+    {% if produtos_vencendo %}
+    <div class="bg-card border border-orange-500 rounded-lg p-6">
+        <h2 class="text-xl font-semibold mb-4 flex items-center gap-2 text-orange-500">
+            <span>⏰</span>
+            Produtos Próximos do Vencimento ({{ produtos_vencendo|length }})
+        </h2>
+        <div class="space-y-3">
+            {% for mov in produtos_vencendo %}
+            <div class="flex items-center justify-between p-4 bg-orange-500/20 rounded-lg">
+                <div>
+                    <p class="font-medium">{{ mov.produto.nome }}</p>
+                    <p class="text-sm text-muted-foreground">
+                        Lote: {{ mov.lote or 'N/A' }} - Vence em {{ mov.validade.strftime('%d/%m/%Y') }}
+                    </p>
+                </div>
+                <span class="px-3 py-1 bg-orange-500 text-white rounded-full text-sm">
+                    {{ mov.quantidade }} un.
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+     Produtos Parados 
+    {% if produtos_parados %}
+    <div class="bg-card border border-border rounded-lg p-6">
+        <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+            <span>📦</span>
+            Produtos Sem Movimentação (90+ dias) ({{ produtos_parados|length }})
+        </h2>
+        <div class="space-y-3">
+            {% for produto in produtos_parados %}
+            <div class="flex items-center justify-between p-4 bg-secondary rounded-lg">
+                <div>
+                    <p class="font-medium">{{ produto.nome }}</p>
+                    <p class="text-sm text-muted-foreground">{{ produto.marca.nome }} - {{ produto.quantidade_estoque }} unidades</p>
+                </div>
+                <a href="/produtos/{{ produto.id }}" class="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm hover:bg-primary/90 transition-colors">
+                    Ver Produto
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+     Sem Alertas 
+    {% if total_alertas == 0 %}
+    <div class="bg-card border border-border rounded-lg p-12 text-center">
+        <span class="text-6xl">✅</span>
+        <h2 class="text-2xl font-semibold mt-4">Tudo em Ordem!</h2>
+        <p class="text-muted-foreground mt-2">Não há alertas no momento. Seu estoque está sob controle.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

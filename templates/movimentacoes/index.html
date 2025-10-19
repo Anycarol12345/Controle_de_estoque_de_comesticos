@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}Movimentação - Integra+ Estoque{% endblock %}
+
+{% block content %}
+<div class="space-y-6 mb-20 md:mb-0">
+    <div>
+        <h1 class="text-3xl font-bold">Movimentação de Estoque</h1>
+        <p class="text-muted-foreground">Registre entradas e saídas de produtos</p>
+    </div>
+
+     Formulários de Entrada e Saída 
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+         Entrada 
+        <div class="bg-card border border-border rounded-lg p-6">
+            <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                <span>📥</span>
+                Entrada de Produtos
+            </h2>
+            
+            <form method="post" action="/movimentacoes/entrada" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Produto</label>
+                    <select name="produto_id" required class="w-full bg-secondary border border-border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option value="">Selecione um produto</option>
+                        {% for produto in produtos %}
+                        <option value="{{ produto.id }}">{{ produto.nome }} - {{ produto.marca.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2">Quantidade</label>
+                    <input type="number" name="quantidade" required min="1" class="w-full bg-secondary border border-border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2">Lote</label>
+                    <input type="text" name="lote" class="w-full bg-secondary border border-border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2">Validade</label>
+                    <input type="date" name="validade" class="w-full bg-secondary border border-border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2">Observação</label>
+                    <textarea name="observacao" rows="2" class="w-full bg-secondary border border-border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"></textarea>
+                </div>
+                
+                <button type="submit" class="w-full bg-green-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-600 transition-colors">
+                    Registrar Entrada
+                </button>
+            </form>
+        </div>
+
+         Saída 
+        <div class="bg-card border border-border rounded-lg p-6">
+            <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                <span>📤</span>
+                Saída de Produtos
+            </h2>
+            
+            <form method="post" action="/movimentacoes/saida" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Produto</label>
+                    <select name="produto_id" id="produto_saida" required class="w-full bg-secondary border border-border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option value="">Selecione um produto</option>
+                        {% for produto in produtos %}
+                        <option value="{{ produto.id }}" data-estoque="{{ produto.quantidade_estoque }}">
+                            {{ produto.nome }} - {{ produto.marca.nome }} (Estoque: {{ produto.quantidade_estoque }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div id="info_estoque" class="hidden p-3 bg-primary/20 rounded-lg">
+                    <p class="text-sm">Estoque disponível: <strong id="estoque_disponivel">0</strong> unidades</p>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2">Quantidade</label>
+                    <input type="number" name="quantidade" id="quantidade_saida" required min="1" class="w-full bg-secondary border border-border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2">Observação</label>
+                    <textarea name="observacao" rows="2" placeholder="Ex: Venda, Amostra, Perda" class="w-full bg-secondary border border-border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"></textarea>
+                </div>
+                
+                <button type="submit" class="w-full bg-red-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-red-600 transition-colors">
+                    Registrar Saída
+                </button>
+            </form>
+        </div>
+    </div>
+
+     Histórico de Movimentações 
+    <div class="bg-card border border-border rounded-lg p-6">
+        <h2 class="text-xl font-semibold mb-4">Histórico de Movimentações</h2>
+        
+        <div class="space-y-3">
+            {% for mov in movimentacoes %}
+            <div class="flex items-center justify-between p-4 bg-secondary rounded-lg">
+                <div class="flex items-center gap-4">
+                    <span class="text-3xl">{% if mov.tipo.value == 'entrada' %}📥{% else %}📤{% endif %}</span>
+                    <div>
+                        <p class="font-medium">{{ mov.produto.nome }}</p>
+                        <p class="text-sm text-muted-foreground">{{ mov.produto.marca.nome }}</p>
+                        {% if mov.observacao %}
+                        <p class="text-sm text-muted-foreground">{{ mov.observacao }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="font-semibold {% if mov.tipo.value == 'entrada' %}text-green-500{% else %}text-red-500{% endif %}">
+                        {% if mov.tipo.value == 'entrada' %}+{% else %}-{% endif %}{{ mov.quantidade }} un.
+                    </p>
+                    <p class="text-sm text-muted-foreground">{{ mov.data.strftime('%d/%m/%Y %H:%M') }}</p>
+                    {% if mov.lote %}
+                    <p class="text-xs text-muted-foreground">Lote: {{ mov.lote }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+    // Mostrar estoque disponível ao selecionar produto
+    const produtoSaida = document.getElementById('produto_saida');
+    const infoEstoque = document.getElementById('info_estoque');
+    const estoqueDisponivel = document.getElementById('estoque_disponivel');
+    const quantidadeSaida = document.getElementById('quantidade_saida');
+    
+    produtoSaida.addEventListener('change', function() {
+        const option = this.options[this.selectedIndex];
+        const estoque = option.getAttribute('data-estoque');
+        
+        if (estoque) {
+            estoqueDisponivel.textContent = estoque;
+            infoEstoque.classList.remove('hidden');
+            quantidadeSaida.max = estoque;
+        } else {
+            infoEstoque.classList.add('hidden');
+        }
+    });
+</script>
+{% endblock %}

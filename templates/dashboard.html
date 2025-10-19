@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Integra+ Estoque{% endblock %}
+
+{% block content %}
+<div class="space-y-6 mb-20 md:mb-0">
+    <div>
+        <h1 class="text-3xl font-bold">Dashboard</h1>
+        <p class="text-muted-foreground">Visão geral do seu estoque</p>
+    </div>
+
+     Cards de Estatísticas 
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-card border border-border rounded-lg p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-muted-foreground">Total de Produtos</p>
+                    <p class="text-3xl font-bold mt-2">{{ total_produtos }}</p>
+                </div>
+                <div class="text-4xl">📦</div>
+            </div>
+        </div>
+
+        <div class="bg-card border border-border rounded-lg p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-muted-foreground">Valor Total</p>
+                    <p class="text-3xl font-bold mt-2">R$ {{ "%.2f"|format(valor_total) }}</p>
+                </div>
+                <div class="text-4xl">💰</div>
+            </div>
+        </div>
+
+        <div class="bg-card border border-border rounded-lg p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-muted-foreground">Estoque Baixo</p>
+                    <p class="text-3xl font-bold mt-2 text-yellow-500">{{ produtos_baixo_estoque }}</p>
+                </div>
+                <div class="text-4xl">⚠️</div>
+            </div>
+        </div>
+    </div>
+
+     Movimentações Recentes e Alertas 
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+         Movimentações Recentes 
+        <div class="bg-card border border-border rounded-lg p-6">
+            <h2 class="text-xl font-semibold mb-4">Movimentações Recentes</h2>
+            <div class="space-y-3">
+                {% for mov in movimentacoes_recentes %}
+                <div class="flex items-center justify-between p-3 bg-secondary rounded-lg">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">{% if mov.tipo.value == 'entrada' %}📥{% else %}📤{% endif %}</span>
+                        <div>
+                            <p class="font-medium">{{ mov.produto.nome }}</p>
+                            <p class="text-sm text-muted-foreground">{{ mov.tipo.value|title }} - {{ mov.quantidade }} unidades</p>
+                        </div>
+                    </div>
+                    <span class="text-sm text-muted-foreground">{{ mov.data.strftime('%d/%m') }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+         Produtos com Estoque Baixo 
+        <div class="bg-card border border-border rounded-lg p-6">
+            <h2 class="text-xl font-semibold mb-4">Alertas de Estoque</h2>
+            <div class="space-y-3">
+                {% for produto in produtos_alerta %}
+                <div class="flex items-center justify-between p-3 bg-secondary rounded-lg">
+                    <div>
+                        <p class="font-medium">{{ produto.nome }}</p>
+                        <p class="text-sm text-muted-foreground">{{ produto.marca.nome }}</p>
+                    </div>
+                    <span class="px-3 py-1 bg-yellow-500/20 text-yellow-500 rounded-full text-sm">
+                        {{ produto.quantidade_estoque }} un.
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+     Top Produtos 
+    <div class="bg-card border border-border rounded-lg p-6">
+        <h2 class="text-xl font-semibold mb-4">Produtos Mais Valiosos</h2>
+        <div class="space-y-3">
+            {% for produto in top_produtos %}
+            <div class="flex items-center justify-between p-3 bg-secondary rounded-lg">
+                <div class="flex-1">
+                    <p class="font-medium">{{ produto.nome }}</p>
+                    <p class="text-sm text-muted-foreground">{{ produto.marca.nome }} - {{ produto.quantidade_estoque }} unidades</p>
+                </div>
+                <div class="text-right">
+                    <p class="font-semibold text-primary">R$ {{ "%.2f"|format(produto.preco_venda * produto.quantidade_estoque) }}</p>
+                    <p class="text-sm text-muted-foreground">R$ {{ "%.2f"|format(produto.preco_venda) }}/un</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Integra+ Estoque{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        background: '#0a0a0a',
+                        foreground: '#ededed',
+                        card: '#141414',
+                        'card-foreground': '#ededed',
+                        primary: '#8b5cf6',
+                        'primary-foreground': '#ffffff',
+                        secondary: '#1f1f1f',
+                        'secondary-foreground': '#ededed',
+                        muted: '#1f1f1f',
+                        'muted-foreground': '#a1a1a1',
+                        accent: '#1f1f1f',
+                        'accent-foreground': '#ededed',
+                        border: '#262626',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-foreground">
+    <div class="flex min-h-screen">
+         Sidebar 
+        <aside class="hidden md:flex w-64 bg-card border-r border-border flex-col">
+            <div class="p-6 border-b border-border">
+                <h1 class="text-2xl font-bold text-primary">Integra+</h1>
+                <p class="text-sm text-muted-foreground">Sistema de Estoque</p>
+            </div>
+            <nav class="flex-1 p-4 space-y-2">
+                <a href="/" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-secondary transition-colors">
+                    <span>📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/produtos" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-secondary transition-colors">
+                    <span>📦</span>
+                    <span>Produtos</span>
+                </a>
+                <a href="/movimentacoes" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-secondary transition-colors">
+                    <span>🔄</span>
+                    <span>Movimentação</span>
+                </a>
+                <a href="/relatorios" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-secondary transition-colors">
+                    <span>📈</span>
+                    <span>Relatórios</span>
+                </a>
+                <a href="/alertas" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-secondary transition-colors">
+                    <span>🔔</span>
+                    <span>Alertas</span>
+                </a>
+            </nav>
+        </aside>
+
+         Mobile Header 
+        <div class="md:hidden fixed top-0 left-0 right-0 bg-card border-b border-border p-4 z-10">
+            <h1 class="text-xl font-bold text-primary">Integra+</h1>
+        </div>
+
+         Main Content 
+        <main class="flex-1 md:p-8 p-4 mt-16 md:mt-0">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+     Mobile Navigation 
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border flex justify-around p-2">
+        <a href="/" class="flex flex-col items-center p-2 text-xs">
+            <span class="text-xl">📊</span>
+            <span>Dashboard</span>
+        </a>
+        <a href="/produtos" class="flex flex-col items-center p-2 text-xs">
+            <span class="text-xl">📦</span>
+            <span>Produtos</span>
+        </a>
+        <a href="/movimentacoes" class="flex flex-col items-center p-2 text-xs">
+            <span class="text-xl">🔄</span>
+            <span>Movimentação</span>
+        </a>
+        <a href="/relatorios" class="flex flex-col items-center p-2 text-xs">
+            <span class="text-xl">📈</span>
+            <span>Relatórios</span>
+        </a>
+        <a href="/alertas" class="flex flex-col items-center p-2 text-xs">
+            <span class="text-xl">🔔</span>
+            <span>Alertas</span>
+        </a>
+    </nav>
+</body>
+</html>

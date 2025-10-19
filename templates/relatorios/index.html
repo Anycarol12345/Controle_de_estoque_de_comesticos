@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Relatórios - Integra+ Estoque{% endblock %}
+
+{% block content %}
+<div class="space-y-6 mb-20 md:mb-0">
+    <div>
+        <h1 class="text-3xl font-bold">Relatórios</h1>
+        <p class="text-muted-foreground">Análise completa do seu estoque</p>
+    </div>
+
+     Resumo Financeiro 
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-card border border-border rounded-lg p-6">
+            <p class="text-sm text-muted-foreground">Valor Total (Venda)</p>
+            <p class="text-3xl font-bold text-primary">R$ {{ "%.2f"|format(valor_total) }}</p>
+        </div>
+        
+        <div class="bg-card border border-border rounded-lg p-6">
+            <p class="text-sm text-muted-foreground">Valor Total (Custo)</p>
+            <p class="text-3xl font-bold">R$ {{ "%.2f"|format(valor_custo) }}</p>
+        </div>
+        
+        <div class="bg-card border border-border rounded-lg p-6">
+            <p class="text-sm text-muted-foreground">Lucro Potencial</p>
+            <p class="text-3xl font-bold text-green-500">R$ {{ "%.2f"|format(lucro_potencial) }}</p>
+        </div>
+    </div>
+
+     Movimentações do Mês 
+    <div class="bg-card border border-border rounded-lg p-6">
+        <h2 class="text-xl font-semibold mb-4">Movimentações dos Últimos 30 Dias</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="p-4 bg-green-500/20 rounded-lg">
+                <p class="text-sm text-muted-foreground">Entradas</p>
+                <p class="text-3xl font-bold text-green-500">{{ entradas_mes }} un.</p>
+            </div>
+            <div class="p-4 bg-red-500/20 rounded-lg">
+                <p class="text-sm text-muted-foreground">Saídas</p>
+                <p class="text-3xl font-bold text-red-500">{{ saidas_mes }} un.</p>
+            </div>
+        </div>
+    </div>
+
+     Produtos por Tipo 
+    <div class="bg-card border border-border rounded-lg p-6">
+        <h2 class="text-xl font-semibold mb-4">Distribuição por Tipo</h2>
+        <div class="space-y-3">
+            {% for tipo, total in produtos_por_tipo %}
+            <div class="flex items-center justify-between p-3 bg-secondary rounded-lg">
+                <span class="font-medium">{{ tipo.value|title }}</span>
+                <span class="px-3 py-1 bg-primary/20 text-primary rounded-full">{{ total }} produtos</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+     Produtos por Marca 
+    <div class="bg-card border border-border rounded-lg p-6">
+        <h2 class="text-xl font-semibold mb-4">Produtos por Marca</h2>
+        <div class="space-y-3">
+            {% for marca, total, estoque in produtos_por_marca %}
+            <div class="flex items-center justify-between p-3 bg-secondary rounded-lg">
+                <div>
+                    <p class="font-medium">{{ marca }}</p>
+                    <p class="text-sm text-muted-foreground">{{ total }} produtos</p>
+                </div>
+                <span class="px-3 py-1 bg-primary/20 text-primary rounded-full">{{ estoque or 0 }} un. em estoque</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+     Produtos Mais Movimentados 
+    <div class="bg-card border border-border rounded-lg p-6">
+        <h2 class="text-xl font-semibold mb-4">Top 10 Produtos Mais Movimentados</h2>
+        <div class="space-y-3">
+            {% for produto in produtos_movimentados %}
+            <div class="flex items-center justify-between p-3 bg-secondary rounded-lg">
+                <div>
+                    <p class="font-medium">{{ produto.nome }}</p>
+                    <p class="text-sm text-muted-foreground">{{ produto.marca }}</p>
+                </div>
+                <div class="text-right">
+                    <p class="font-semibold text-primary">{{ produto.movimentacoes }} movimentações</p>
+                    <p class="text-sm text-muted-foreground">{{ produto.quantidade_total }} un. total</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+     Alertas 
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+         Estoque Baixo 
+        <div class="bg-card border border-border rounded-lg p-6">
+            <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                <span>⚠️</span>
+                Produtos com Estoque Baixo
+            </h2>
+            <div class="space-y-2">
+                {% for produto in produtos_baixo_estoque %}
+                <div class="p-3 bg-yellow-500/20 rounded-lg">
+                    <p class="font-medium">{{ produto.nome }}</p>
+                    <p class="text-sm text-muted-foreground">{{ produto.marca.nome }} - {{ produto.quantidade_estoque }} unidades</p>
+                </div>
+                {% else %}
+                <p class="text-muted-foreground">Nenhum produto com estoque baixo</p>
+                {% endfor %}
+            </div>
+        </div>
+
+         Sem Movimentação 
+        <div class="bg-card border border-border rounded-lg p-6">
+            <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                <span>📦</span>
+                Produtos Sem Movimentação
+            </h2>
+            <div class="space-y-2">
+                {% for produto in produtos_sem_movimento %}
+                <div class="p-3 bg-secondary rounded-lg">
+                    <p class="font-medium">{{ produto.nome }}</p>
+                    <p class="text-sm text-muted-foreground">{{ produto.marca.nome }}</p>
+                </div>
+                {% else %}
+                <p class="text-muted-foreground">Todos os produtos têm movimentação</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

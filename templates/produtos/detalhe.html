@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}{{ produto.nome }} - Integra+ Estoque{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6 mb-20 md:mb-0">
+    <div class="flex items-center gap-4">
+        <a href="/produtos" class="text-2xl">←</a>
+        <div class="flex-1">
+            <div class="flex items-center gap-3">
+                <h1 class="text-3xl font-bold">{{ produto.nome }}</h1>
+                <span class="px-3 py-1 bg-primary/20 text-primary rounded-lg text-sm">{{ produto.tipo_produto.value|title }}</span>
+            </div>
+            <p class="text-muted-foreground">{{ produto.marca.nome }} - SKU: {{ produto.sku }}</p>
+        </div>
+    </div>
+
+     Informações Gerais 
+    <div class="bg-card border border-border rounded-lg p-6 space-y-4">
+        <h2 class="text-xl font-semibold">Informações Gerais</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+                <p class="text-sm text-muted-foreground">Categoria</p>
+                <p class="font-medium">{{ produto.categoria or '-' }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-muted-foreground">Marca</p>
+                <p class="font-medium">{{ produto.marca.nome }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-muted-foreground">Linha</p>
+                <p class="font-medium">{{ produto.linha or '-' }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-muted-foreground">Estoque</p>
+                <p class="font-medium text-primary">{{ produto.quantidade_estoque }} unidades</p>
+            </div>
+        </div>
+    </div>
+
+     Preços 
+    <div class="bg-card border border-border rounded-lg p-6 space-y-4">
+        <h2 class="text-xl font-semibold">Preços e Margem</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <p class="text-sm text-muted-foreground">Preço de Custo</p>
+                <p class="text-2xl font-bold">R$ {{ "%.2f"|format(produto.preco_custo) }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-muted-foreground">Preço de Venda</p>
+                <p class="text-2xl font-bold text-primary">R$ {{ "%.2f"|format(produto.preco_venda) }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-muted-foreground">Margem de Lucro</p>
+                <p class="text-2xl font-bold text-green-500">{{ "%.1f"|format(((produto.preco_venda - produto.preco_custo) / produto.preco_custo * 100)) }}%</p>
+            </div>
+        </div>
+    </div>
+
+     Campos Específicos por Tipo 
+    {% if produto.tipo_produto.value == 'perfume' %}
+    <div class="bg-card border border-border rounded-lg p-6 space-y-4">
+        <h2 class="text-xl font-semibold">Informações de Perfume/Colônia</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <p class="text-sm text-muted-foreground">Concentração</p>
+                <p class="font-medium">{{ produto.concentracao or '-' }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-muted-foreground">Subfamília</p>
+                <p class="font-medium">{{ produto.subfamilia or '-' }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-muted-foreground">Ocasião</p>
+                <p class="font-medium">{{ produto.ocasiao or '-' }}</p>
+            </div>
+        </div>
+    </div>
+    {% elif produto.tipo_produto.value == 'creme' %}
+    <div class="bg-card border border-border rounded-lg p-6 space-y-4">
+        <h2 class="text-xl font-semibold">Informações de Creme</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <p class="text-sm text-muted-foreground">Tipo de Pele</p>
+                <p class="font-medium">{{ produto.tipo_pele or '-' }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-muted-foreground">Ação/Resultado</p>
+                <p class="font-medium">{{ produto.acao_resultado or '-' }}</p>
+            </div>
+        </div>
+    </div>
+    {% elif produto.tipo_produto.value == 'maquiagem' %}
+    <div class="bg-card border border-border rounded-lg p-6 space-y-4">
+        <h2 class="text-xl font-semibold">Informações de Maquiagem</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+                <p class="text-sm text-muted-foreground">Textura</p>
+                <p class="font-medium">{{ produto.textura or '-' }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-muted-foreground">Cobertura</p>
+                <p class="font-medium">{{ produto.cobertura or '-' }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-muted-foreground">Fundo de Cor</p>
+                <p class="font-medium">{{ produto.fundo_cor or '-' }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-muted-foreground">Tonalidade</p>
+                <p class="font-medium">{{ produto.tonalidade or '-' }}</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+     Propriedades 
+    {% if produto.propriedades %}
+    <div class="bg-card border border-border rounded-lg p-6 space-y-4">
+        <h2 class="text-xl font-semibold">Propriedades</h2>
+        <p class="text-muted-foreground">{{ produto.propriedades }}</p>
+    </div>
+    {% endif %}
+
+     Detalhes 
+    {% if produto.detalhes %}
+    <div class="bg-card border border-border rounded-lg p-6 space-y-4">
+        <h2 class="text-xl font-semibold">Detalhes</h2>
+        <p class="text-muted-foreground">{{ produto.detalhes }}</p>
+    </div>
+    {% endif %}
+
+     Ingredientes 
+    {% if produto.ingredientes %}
+    <div class="bg-card border border-border rounded-lg p-6 space-y-4">
+        <h2 class="text-xl font-semibold">Ingredientes</h2>
+        <p class="text-muted-foreground">{{ produto.ingredientes }}</p>
+    </div>
+    {% endif %}
+
+     Como Usar 
+    {% if produto.como_usar %}
+    <div class="bg-card border border-border rounded-lg p-6 space-y-4">
+        <h2 class="text-xl font-semibold">Como Usar</h2>
+        <p class="text-muted-foreground">{{ produto.como_usar }}</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
