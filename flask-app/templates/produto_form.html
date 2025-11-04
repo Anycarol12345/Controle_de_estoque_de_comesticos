@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}{% if produto %}Editar{% else %}Novo{% endif %} Produto - Integra+ Estoque{% endblock %}
+
+{% block content %}
+<h1 class="text-3xl font-bold mb-6">{% if produto %}Editar{% else %}Novo{% endif %} Produto</h1>
+
+<form method="POST" class="bg-gray-800 rounded-lg p-6 border border-gray-700 max-w-4xl">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Campos Básicos -->
+        <div>
+            <label class="block text-sm font-medium mb-2">Nome do Produto</label>
+            <input type="text" name="nome" required 
+                   class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white">
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium mb-2">SKU</label>
+            <input type="text" name="sku" required 
+                   class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white">
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium mb-2">Marca</label>
+            <select name="marca_id" required 
+                    class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white">
+                {% for marca in marcas %}
+                <option value="{{ marca.id }}">{{ marca.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium mb-2">Tipo de Produto</label>
+            <select name="tipo_produto" id="tipo_produto" required 
+                    class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white"
+                    onchange="mostrarCamposEspecificos()">
+                <option value="">Selecione...</option>
+                <option value="perfume">Perfume/Colônia</option>
+                <option value="creme">Creme</option>
+                <option value="maquiagem">Maquiagem</option>
+            </select>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium mb-2">Categoria</label>
+            <input type="text" name="categoria" 
+                   class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white">
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium mb-2">Preço de Custo</label>
+            <input type="number" step="0.01" name="preco_custo" required 
+                   class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white">
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium mb-2">Preço de Venda</label>
+            <input type="number" step="0.01" name="preco_venda" required 
+                   class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white">
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium mb-2">Estoque Mínimo</label>
+            <input type="number" name="estoque_minimo" value="10" 
+                   class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white">
+        </div>
+    </div>
+    
+    <!-- Campos Específicos para Perfumes -->
+    <div id="campos_perfume" class="hidden mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+            <label class="block text-sm font-medium mb-2">Concentração</label>
+            <input type="text" name="concentracao" 
+                   class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white">
+        </div>
+        <div>
+            <label class="block text-sm font-medium mb-2">Subfamílias</label>
+            <input type="text" name="subfamilias" 
+                   class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white">
+        </div>
+        <div>
+            <label class="block text-sm font-medium mb-2">Ocasião</label>
+            <input type="text" name="ocasiao" 
+                   class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white">
+        </div>
+    </div>
+    
+    <!-- Campos Específicos para Cremes -->
+    <div id="campos_creme" class="hidden mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+            <label class="block text-sm font-medium mb-2">Tipo de Pele</label>
+            <input type="text" name="tipo_pele" 
+                   class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white">
+        </div>
+        <div>
+            <label class="block text-sm font-medium mb-2">Ação/Resultado</label>
+            <input type="text" name="acao_resultado" 
+                   class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white">
+        </div>
+    </div>
+    
+    <!-- Campos Específicos para Maquiagens -->
+    <div id="campos_maquiagem" class="hidden mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+            <label class="block text-sm font-medium mb-2">Textura</label>
+            <input type="text" name="textura" 
+                   class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white">
+        </div>
+        <div>
+            <label class="block text-sm font-medium mb-2">Cobertura</label>
+            <input type="text" name="cobertura" 
+                   class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white">
+        </div>
+        <div>
+            <label class="block text-sm font-medium mb-2">Fundo de Cor</label>
+            <input type="text" name="fundo_cor" 
+                   class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white">
+        </div>
+        <div>
+            <label class="block text-sm font-medium mb-2">Tonalidade</label>
+            <input type="text" name="tonalidade" 
+                   class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white">
+        </div>
+    </div>
+    
+    <!-- Campos Comuns -->
+    <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+            <label class="block text-sm font-medium mb-2">Linha</label>
+            <input type="text" name="linha" 
+                   class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white">
+        </div>
+        <div>
+            <label class="block text-sm font-medium mb-2">Propriedades</label>
+            <input type="text" name="propriedades" 
+                   class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white">
+        </div>
+    </div>
+    
+    <div class="mt-6">
+        <label class="block text-sm font-medium mb-2">Detalhes</label>
+        <textarea name="detalhes" rows="3" 
+                  class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white"></textarea>
+    </div>
+    
+    <div class="mt-6">
+        <label class="block text-sm font-medium mb-2">Ingredientes</label>
+        <textarea name="ingredientes" rows="3" 
+                  class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white"></textarea>
+    </div>
+    
+    <div class="mt-6">
+        <label class="block text-sm font-medium mb-2">Como Usar</label>
+        <textarea name="como_usar" rows="3" 
+                  class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white"></textarea>
+    </div>
+    
+    <div class="mt-6 flex gap-4">
+        <button type="submit" class="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-lg">
+            Salvar
+        </button>
+        <a href="{{ url_for('produtos') }}" class="bg-gray-700 hover:bg-gray-600 px-6 py-2 rounded-lg">
+            Cancelar
+        </a>
+    </div>
+</form>
+
+<script>
+function mostrarCamposEspecificos() {
+    const tipo = document.getElementById('tipo_produto').value;
+    document.getElementById('campos_perfume').classList.add('hidden');
+    document.getElementById('campos_creme').classList.add('hidden');
+    document.getElementById('campos_maquiagem').classList.add('hidden');
+    
+    if (tipo === 'perfume') {
+        document.getElementById('campos_perfume').classList.remove('hidden');
+    } else if (tipo === 'creme') {
+        document.getElementById('campos_creme').classList.remove('hidden');
+    } else if (tipo === 'maquiagem') {
+        document.getElementById('campos_maquiagem').classList.remove('hidden');
+    }
+}
+</script>
+{% endblock %}

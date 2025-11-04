@@ -1,0 +1,128 @@
+<div class="p-6 pb-20 md:pb-6">
+  <div class="mb-6">
+    <a routerLink="/produtos" class="text-blue-600 hover:text-blue-800">← Voltar para Produtos</a>
+  </div>
+
+  <div *ngIf="loading" class="text-center py-12">
+    <p class="text-gray-500">Carregando...</p>
+  </div>
+
+  <div *ngIf="!loading && produto" class="bg-white rounded-lg shadow">
+    <div class="p-6 border-b">
+      <h1 class="text-3xl font-bold text-gray-800">{{ produto.nome }}</h1>
+      <p class="text-gray-500 mt-2">SKU: {{ produto.sku }}</p>
+    </div>
+
+    <div class="p-6 space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <h3 class="font-semibold text-gray-700 mb-3">Informações Gerais</h3>
+          <div class="space-y-2">
+            <div class="flex justify-between">
+              <span class="text-gray-600">Marca:</span>
+              <span class="font-medium">{{ produto.marca?.nome || '-' }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Tipo:</span>
+              <span class="font-medium">{{ produto.tipo_produto }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Preço de Custo:</span>
+              <span class="font-medium">{{ formatarMoeda(produto.preco_custo) }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Preço de Venda:</span>
+              <span class="font-medium">{{ formatarMoeda(produto.preco_venda) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="font-semibold text-gray-700 mb-3">Estoque</h3>
+          <div class="space-y-2">
+            <div class="flex justify-between">
+              <span class="text-gray-600">Quantidade:</span>
+              <span class="font-medium">{{ produto.quantidade_estoque }} unidades</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Estoque Mínimo:</span>
+              <span class="font-medium">{{ produto.estoque_minimo }} unidades</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="produto.tipo_produto === 'perfume'" class="border-t pt-6">
+        <h3 class="font-semibold text-gray-700 mb-3">Detalhes do Perfume</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div *ngIf="produto.concentracao">
+            <span class="text-gray-600">Concentração:</span>
+            <p class="font-medium">{{ produto.concentracao }}</p>
+          </div>
+          <div *ngIf="produto.subfamilias">
+            <span class="text-gray-600">Subfamílias:</span>
+            <p class="font-medium">{{ produto.subfamilias }}</p>
+          </div>
+          <div *ngIf="produto.ocasiao">
+            <span class="text-gray-600">Ocasião:</span>
+            <p class="font-medium">{{ produto.ocasiao }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="produto.tipo_produto === 'creme'" class="border-t pt-6">
+        <h3 class="font-semibold text-gray-700 mb-3">Detalhes do Creme</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div *ngIf="produto.tipo_pele">
+            <span class="text-gray-600">Tipo de Pele:</span>
+            <p class="font-medium">{{ produto.tipo_pele }}</p>
+          </div>
+          <div *ngIf="produto.propriedades">
+            <span class="text-gray-600">Propriedades:</span>
+            <p class="font-medium">{{ produto.propriedades }}</p>
+          </div>
+          <div *ngIf="produto.linha">
+            <span class="text-gray-600">Linha:</span>
+            <p class="font-medium">{{ produto.linha }}</p>
+          </div>
+          <div *ngIf="produto.acao_resultado">
+            <span class="text-gray-600">Ação/Resultado:</span>
+            <p class="font-medium">{{ produto.acao_resultado }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="produto.tipo_produto === 'maquiagem'" class="border-t pt-6">
+        <h3 class="font-semibold text-gray-700 mb-3">Detalhes da Maquiagem</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div *ngIf="produto.textura">
+            <span class="text-gray-600">Textura:</span>
+            <p class="font-medium">{{ produto.textura }}</p>
+          </div>
+          <div *ngIf="produto.cobertura">
+            <span class="text-gray-600">Cobertura:</span>
+            <p class="font-medium">{{ produto.cobertura }}</p>
+          </div>
+          <div *ngIf="produto.fundo_cor">
+            <span class="text-gray-600">Fundo de Cor:</span>
+            <p class="font-medium">{{ produto.fundo_cor }}</p>
+          </div>
+          <div *ngIf="produto.tonalidade">
+            <span class="text-gray-600">Tonalidade:</span>
+            <p class="font-medium">{{ produto.tonalidade }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="produto.ingredientes" class="border-t pt-6">
+        <h3 class="font-semibold text-gray-700 mb-3">Ingredientes</h3>
+        <p class="text-gray-700">{{ produto.ingredientes }}</p>
+      </div>
+
+      <div *ngIf="produto.como_usar" class="border-t pt-6">
+        <h3 class="font-semibold text-gray-700 mb-3">Como Usar</h3>
+        <p class="text-gray-700">{{ produto.como_usar }}</p>
+      </div>
+    </div>
+  </div>
+</div>

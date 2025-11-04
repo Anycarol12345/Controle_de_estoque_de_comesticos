@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}Movimentações - Integra+ Estoque{% endblock %}
+
+{% block content %}
+<h1 class="text-3xl font-bold mb-6">Movimentação de Estoque</h1>
+
+<!-- Abas -->
+<div class="mb-6 border-b border-gray-700">
+    <div class="flex gap-4">
+        <button onclick="mostrarAba('entrada')" id="btn-entrada" 
+                class="px-4 py-2 border-b-2 border-purple-500 text-purple-400">
+            Entrada
+        </button>
+        <button onclick="mostrarAba('saida')" id="btn-saida" 
+                class="px-4 py-2 border-b-2 border-transparent text-gray-400 hover:text-gray-300">
+            Saída
+        </button>
+        <button onclick="mostrarAba('historico')" id="btn-historico" 
+                class="px-4 py-2 border-b-2 border-transparent text-gray-400 hover:text-gray-300">
+            Histórico
+        </button>
+    </div>
+</div>
+
+<!-- Formulário de Entrada -->
+<div id="aba-entrada" class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+    <h2 class="text-xl font-bold mb-4">Registrar Entrada</h2>
+    <form method="POST" action="{{ url_for('movimentacao_entrada') }}" class="space-y-4">
+        <div>
+            <label class="block text-sm font-medium mb-2">Produto</label>
+            <select name="produto_id" required onchange="atualizarEstoque(this, 'estoque-entrada')"
+                    class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white">
+                <option value="">Selecione um produto...</option>
+                {% for produto in produtos %}
+                <option value="{{ produto.id }}" data-estoque="{{ produto.quantidade_estoque }}">
+                    {{ produto.nome }} - {{ produto.marca.nome }}
+                </option>
+                {% endfor %}
+            </select>
+            <p id="estoque-entrada" class="text-sm text-gray-400 mt-1"></p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium mb-2">Quantidade</label>
+                <input type="number" name="quantidade" required min="1"
+                       class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white">
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-2">Lote</label>
+                <input type="text" name="lote"
+                       class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white">
+            </div>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium mb-2">Validade</label>
+            <input type="date" name="validade"
+                   class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white">
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium mb-2">Observação</label>
+            <textarea name="observacao" rows="3"
+                      class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white"></textarea>
+        </div>
+        
+        <button type="submit" class="bg-green-600 hover:bg-green-700 px-6 py-2 rounded-lg">
+            Registrar Entrada
+        </button>
+    </form>
+</div>
+
+<!-- Formulário de Saída -->
+<div id="aba-saida" class="hidden bg-gray-800 rounded-lg p-6 border border-gray-700">
+    <h2 class="text-xl font-bold mb-4">Registrar Saída</h2>
+    <form method="POST" action="{{ url_for('movimentacao_saida') }}" class="space-y-4" onsubmit="return validarSaida()">
+        <div>
+            <label class="block text-sm font-medium mb-2">Produto</label>
+            <select name="produto_id" id="produto-saida" required onchange="atualizarEstoque(this, 'estoque-saida')"
+                    class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white">
+                <option value="">Selecione um produto...</option>
+                {% for produto in produtos %}
+                <option value="{{ produto.id }}" data-estoque="{{ produto.quantidade_estoque }}">
+                    {{ produto.nome }} - {{ produto.marca.nome }}
+                </option>
+                {% endfor %}
+            </select>
+            <p id="estoque-saida" class="text-sm text-gray-400 mt-1"></p>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium mb-2">Quantidade</label>
+            <input type="number" name="quantidade" id="quantidade-saida" required min="1"
+                   class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white">
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium mb-2">Observação</label>
+            <textarea name="observacao" rows="3"
+                      class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white"></textarea>
+        </div>
+        
+        <button type="submit" class="bg-red-600 hover:bg-red-700 px-6 py-2 rounded-lg">
+            Registrar Saída
+        </button>
+    </form>
+</div>
+
+<!-- Histórico -->
+<div id="aba-historico" class="hidden bg-gray-800 rounded-lg border border-gray-700 overflow-x-auto">
+    <table class="w-full">
+        <thead class="bg-gray-700">
+            <tr>
+                <th class="px-4 py-3 text-left">Data</th>
+                <th class="px-4 py-3 text-left">Produto</th>
+                <th class="px-4 py-3 text-left">Tipo</th>
+                <th class="px-4 py-3 text-right">Quantidade</th>
+                <th class="px-4 py-3 text-left">Lote</th>
+                <th class="px-4 py-3 text-left">Observação</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for mov in movimentacoes %}
+            <tr class="border-t border-gray-700 hover:bg-gray-700">
+                <td class="px-4 py-3">{{ mov.data.strftime('%d/%m/%Y %H:%M') }}</td>
+                <td class="px-4 py-3">{{ mov.produto.nome }}</td>
+                <td class="px-4 py-3">
+                    <span class="px-2 py-1 rounded text-xs {% if mov.tipo == 'entrada' %}bg-green-900 text-green-300{% else %}bg-red-900 text-red-300{% endif %}">
+                        {{ mov.tipo.upper() }}
+                    </span>
+                </td>
+                <td class="px-4 py-3 text-right">{{ mov.quantidade }}</td>
+                <td class="px-4 py-3">{{ mov.lote or '-' }}</td>
+                <td class="px-4 py-3 text-gray-400">{{ mov.observacao or '-' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+function mostrarAba(aba) {
+    // Esconder todas as abas
+    document.getElementById('aba-entrada').classList.add('hidden');
+    document.getElementById('aba-saida').classList.add('hidden');
+    document.getElementById('aba-historico').classList.add('hidden');
+    
+    // Remover estilo ativo de todos os botões
+    document.getElementById('btn-entrada').classList.remove('border-purple-500', 'text-purple-400');
+    document.getElementById('btn-entrada').classList.add('border-transparent', 'text-gray-400');
+    document.getElementById('btn-saida').classList.remove('border-purple-500', 'text-purple-400');
+    document.getElementById('btn-saida').classList.add('border-transparent', 'text-gray-400');
+    document.getElementById('btn-historico').classList.remove('border-purple-500', 'text-purple-400');
+    document.getElementById('btn-historico').classList.add('border-transparent', 'text-gray-400');
+    
+    // Mostrar aba selecionada
+    document.getElementById('aba-' + aba).classList.remove('hidden');
+    document.getElementById('btn-' + aba).classList.add('border-purple-500', 'text-purple-400');
+    document.getElementById('btn-' + aba).classList.remove('border-transparent', 'text-gray-400');
+}
+
+function atualizarEstoque(select, elementoId) {
+    const option = select.options[select.selectedIndex];
+    const estoque = option.getAttribute('data-estoque');
+    const elemento = document.getElementById(elementoId);
+    
+    if (estoque) {
+        elemento.textContent = `Estoque atual: ${estoque} unidades`;
+    } else {
+        elemento.textContent = '';
+    }
+}
+
+function validarSaida() {
+    const select = document.getElementById('produto-saida');
+    const option = select.options[select.selectedIndex];
+    const estoque = parseInt(option.getAttribute('data-estoque'));
+    const quantidade = parseInt(document.getElementById('quantidade-saida').value);
+    
+    if (quantidade > estoque) {
+        alert('Quantidade solicitada maior que o estoque disponível!');
+        return false;
+    }
+    return true;
+}
+</script>
+{% endblock %}

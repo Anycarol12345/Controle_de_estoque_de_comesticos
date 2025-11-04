@@ -1,0 +1,143 @@
+<div class="p-6 pb-20 md:pb-6">
+  <h1 class="text-3xl font-bold text-gray-800 mb-6">Movimentações de Estoque</h1>
+
+  <div class="bg-white rounded-lg shadow mb-6">
+    <div class="flex border-b">
+      <button
+        (click)="mudarAba('entrada')"
+        [class]="abaAtiva === 'entrada' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600'"
+        class="flex-1 px-6 py-3 font-medium hover:bg-gray-50"
+      >
+        Entrada
+      </button>
+      <button
+        (click)="mudarAba('saida')"
+        [class]="abaAtiva === 'saida' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600'"
+        class="flex-1 px-6 py-3 font-medium hover:bg-gray-50"
+      >
+        Saída
+      </button>
+      <button
+        (click)="mudarAba('historico')"
+        [class]="abaAtiva === 'historico' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600'"
+        class="flex-1 px-6 py-3 font-medium hover:bg-gray-50"
+      >
+        Histórico
+      </button>
+    </div>
+
+    <div class="p-6">
+      <div *ngIf="abaAtiva === 'entrada'" class="space-y-4">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Registrar Entrada</h2>
+        <form (ngSubmit)="registrarMovimentacao()" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Produto</label>
+            <select [(ngModel)]="novaMovimentacao.produto_id" name="produto_id" required class="border rounded-lg px-4 py-2 w-full">
+              <option value="0">Selecione um produto</option>
+              <option *ngFor="let produto of produtos" [value]="produto.id">
+                {{ produto.nome }} ({{ produto.sku }})
+              </option>
+            </select>
+          </div>
+
+          <div *ngIf="getProdutoSelecionado()" class="bg-blue-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-700">
+              Estoque atual: <span class="font-semibold">{{ getProdutoSelecionado()?.quantidade_estoque }} unidades</span>
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Quantidade</label>
+              <input type="number" [(ngModel)]="novaMovimentacao.quantidade" name="quantidade" min="1" required class="border rounded-lg px-4 py-2 w-full" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Lote</label>
+              <input type="text" [(ngModel)]="novaMovimentacao.lote" name="lote" class="border rounded-lg px-4 py-2 w-full" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Validade</label>
+              <input type="date" [(ngModel)]="novaMovimentacao.validade" name="validade" class="border rounded-lg px-4 py-2 w-full" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Observação</label>
+            <textarea [(ngModel)]="novaMovimentacao.observacao" name="observacao" rows="3" class="border rounded-lg px-4 py-2 w-full"></textarea>
+          </div>
+
+          <button type="submit" class="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+            Registrar Entrada
+          </button>
+        </form>
+      </div>
+
+      <div *ngIf="abaAtiva === 'saida'" class="space-y-4">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Registrar Saída</h2>
+        <form (ngSubmit)="registrarMovimentacao()" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Produto</label>
+            <select [(ngModel)]="novaMovimentacao.produto_id" name="produto_id" required class="border rounded-lg px-4 py-2 w-full">
+              <option value="0">Selecione um produto</option>
+              <option *ngFor="let produto of produtos" [value]="produto.id">
+                {{ produto.nome }} ({{ produto.sku }})
+              </option>
+            </select>
+          </div>
+
+          <div *ngIf="getProdutoSelecionado()" class="bg-blue-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-700">
+              Estoque disponível: <span class="font-semibold">{{ getProdutoSelecionado()?.quantidade_estoque }} unidades</span>
+            </p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Quantidade</label>
+            <input type="number" [(ngModel)]="novaMovimentacao.quantidade" name="quantidade" min="1" required class="border rounded-lg px-4 py-2 w-full" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Observação</label>
+            <textarea [(ngModel)]="novaMovimentacao.observacao" name="observacao" rows="3" class="border rounded-lg px-4 py-2 w-full"></textarea>
+          </div>
+
+          <button type="submit" class="w-full bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
+            Registrar Saída
+          </button>
+        </form>
+      </div>
+
+      <div *ngIf="abaAtiva === 'historico'">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Histórico de Movimentações</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-gray-50 border-b">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Produto</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Quantidade</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Lote</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Observação</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+              <tr *ngFor="let mov of movimentacoes" class="hover:bg-gray-50">
+                <td class="px-6 py-4">{{ formatarData(mov.data) }}</td>
+                <td class="px-6 py-4">{{ mov.produto?.nome || '-' }}</td>
+                <td class="px-6 py-4">
+                  <span [class]="mov.tipo === 'entrada' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'" class="px-2 py-1 rounded text-sm">
+                    {{ mov.tipo === 'entrada' ? 'Entrada' : 'Saída' }}
+                  </span>
+                </td>
+                <td class="px-6 py-4">{{ mov.quantidade }}</td>
+                <td class="px-6 py-4">{{ mov.lote || '-' }}</td>
+                <td class="px-6 py-4">{{ mov.observacao || '-' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

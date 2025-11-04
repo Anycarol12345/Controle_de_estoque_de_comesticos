@@ -3,12 +3,11 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "integra-estoque": {
+    "inventario-angular": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
-          "style": "css",
-          "standalone": true
+          "style": "css"
         }
       },
       "root": "",
@@ -16,13 +15,12 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:application",
+          "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/integra-estoque",
+            "outputPath": "dist/inventario-angular",
             "index": "src/index.html",
-            "browser": "src/main.ts",
-            "polyfills": ["zone.js"],
-            "tsConfig": "tsconfig.app.json",
+            "main": "src/main.ts",
+            "tsConfig": "tsconfig.json",
             "assets": ["src/favicon.ico", "src/assets"],
             "styles": ["src/styles.css"],
             "scripts": []
@@ -31,8 +29,14 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "buildTarget": "integra-estoque:build"
-          }
+            "buildTarget": "inventario-angular:build"
+          },
+          "configurations": {
+            "development": {
+              "buildTarget": "inventario-angular:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
         }
       }
     }

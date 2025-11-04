@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Relatórios - Integra+ Estoque{% endblock %}
+
+{% block content %}
+<h1 class="text-3xl font-bold mb-6">Relatórios</h1>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Vendas por Marca -->
+    <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <h2 class="text-xl font-bold mb-4">Vendas por Marca</h2>
+        <div class="space-y-3">
+            {% for venda in vendas_marca %}
+            <div class="flex justify-between items-center p-3 bg-gray-700 rounded">
+                <span class="font-medium">{{ venda.nome }}</span>
+                <span class="text-purple-400 font-bold">{{ venda.total }} unidades</span>
+            </div>
+            {% endfor %}
+            {% if not vendas_marca %}
+            <p class="text-gray-400 text-center py-4">Nenhuma venda registrada</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Produtos Mais Vendidos -->
+    <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <h2 class="text-xl font-bold mb-4">Produtos Mais Vendidos</h2>
+        <div class="space-y-3">
+            {% for produto in produtos_vendidos %}
+            <div class="flex justify-between items-center p-3 bg-gray-700 rounded">
+                <div>
+                    <p class="font-medium">{{ produto.nome }}</p>
+                    <p class="text-sm text-gray-400">{{ produto.marca }}</p>
+                </div>
+                <span class="text-purple-400 font-bold">{{ produto.total }} un</span>
+            </div>
+            {% endfor %}
+            {% if not produtos_vendidos %}
+            <p class="text-gray-400 text-center py-4">Nenhuma venda registrada</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Rentabilidade -->
+<div class="mt-6 bg-gray-800 rounded-lg p-6 border border-gray-700">
+    <h2 class="text-xl font-bold mb-4">Análise de Rentabilidade</h2>
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead class="bg-gray-700">
+                <tr>
+                    <th class="px-4 py-3 text-left">Produto</th>
+                    <th class="px-4 py-3 text-left">Marca</th>
+                    <th class="px-4 py-3 text-right">Estoque</th>
+                    <th class="px-4 py-3 text-right">Custo Unit.</th>
+                    <th class="px-4 py-3 text-right">Venda Unit.</th>
+                    <th class="px-4 py-3 text-right">Margem</th>
+                    <th class="px-4 py-3 text-right">Lucro Potencial</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for produto in produtos_rentabilidade %}
+                <tr class="border-t border-gray-700 hover:bg-gray-700">
+                    <td class="px-4 py-3">{{ produto.nome }}</td>
+                    <td class="px-4 py-3">{{ produto.marca.nome }}</td>
+                    <td class="px-4 py-3 text-right">{{ produto.quantidade_estoque }}</td>
+                    <td class="px-4 py-3 text-right">R$ {{ "%.2f"|format(produto.preco_custo) }}</td>
+                    <td class="px-4 py-3 text-right">R$ {{ "%.2f"|format(produto.preco_venda) }}</td>
+                    <td class="px-4 py-3 text-right text-green-400">{{ "%.1f"|format(produto.margem_lucro) }}%</td>
+                    <td class="px-4 py-3 text-right text-green-400">
+                        R$ {{ "%.2f"|format((produto.preco_venda - produto.preco_custo) * produto.quantidade_estoque) }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

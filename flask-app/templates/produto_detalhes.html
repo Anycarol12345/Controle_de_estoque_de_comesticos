@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}{{ produto.nome }} - Integra+ Estoque{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <a href="{{ url_for('produtos') }}" class="text-purple-400 hover:text-purple-300">← Voltar</a>
+</div>
+
+<div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+    <h1 class="text-3xl font-bold mb-6">{{ produto.nome }}</h1>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+            <h2 class="text-xl font-bold mb-4 text-purple-400">Informações Básicas</h2>
+            <div class="space-y-3">
+                <div>
+                    <p class="text-sm text-gray-400">SKU</p>
+                    <p class="font-medium">{{ produto.sku }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-400">Marca</p>
+                    <p class="font-medium">{{ produto.marca.nome }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-400">Categoria</p>
+                    <p class="font-medium">{{ produto.categoria or 'N/A' }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-400">Tipo</p>
+                    <p class="font-medium">{{ produto.tipo_produto or 'N/A' }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div>
+            <h2 class="text-xl font-bold mb-4 text-purple-400">Preços e Estoque</h2>
+            <div class="space-y-3">
+                <div>
+                    <p class="text-sm text-gray-400">Preço de Custo</p>
+                    <p class="font-medium">R$ {{ "%.2f"|format(produto.preco_custo) }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-400">Preço de Venda</p>
+                    <p class="font-medium">R$ {{ "%.2f"|format(produto.preco_venda) }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-400">Margem de Lucro</p>
+                    <p class="font-medium text-green-400">{{ "%.1f"|format(produto.margem_lucro) }}%</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-400">Estoque Atual</p>
+                    <p class="font-medium">{{ produto.quantidade_estoque }} unidades</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-400">Estoque Mínimo</p>
+                    <p class="font-medium">{{ produto.estoque_minimo }} unidades</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% if produto.tipo_produto == 'perfume' %}
+    <div class="mt-8">
+        <h2 class="text-xl font-bold mb-4 text-purple-400">Detalhes do Perfume</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {% if produto.concentracao %}
+            <div>
+                <p class="text-sm text-gray-400">Concentração</p>
+                <p class="font-medium">{{ produto.concentracao }}</p>
+            </div>
+            {% endif %}
+            {% if produto.subfamilias %}
+            <div>
+                <p class="text-sm text-gray-400">Subfamílias</p>
+                <p class="font-medium">{{ produto.subfamilias }}</p>
+            </div>
+            {% endif %}
+            {% if produto.ocasiao %}
+            <div>
+                <p class="text-sm text-gray-400">Ocasião</p>
+                <p class="font-medium">{{ produto.ocasiao }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if produto.tipo_produto == 'creme' %}
+    <div class="mt-8">
+        <h2 class="text-xl font-bold mb-4 text-purple-400">Detalhes do Creme</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% if produto.tipo_pele %}
+            <div>
+                <p class="text-sm text-gray-400">Tipo de Pele</p>
+                <p class="font-medium">{{ produto.tipo_pele }}</p>
+            </div>
+            {% endif %}
+            {% if produto.acao_resultado %}
+            <div>
+                <p class="text-sm text-gray-400">Ação/Resultado</p>
+                <p class="font-medium">{{ produto.acao_resultado }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if produto.tipo_produto == 'maquiagem' %}
+    <div class="mt-8">
+        <h2 class="text-xl font-bold mb-4 text-purple-400">Detalhes da Maquiagem</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% if produto.textura %}
+            <div>
+                <p class="text-sm text-gray-400">Textura</p>
+                <p class="font-medium">{{ produto.textura }}</p>
+            </div>
+            {% endif %}
+            {% if produto.cobertura %}
+            <div>
+                <p class="text-sm text-gray-400">Cobertura</p>
+                <p class="font-medium">{{ produto.cobertura }}</p>
+            </div>
+            {% endif %}
+            {% if produto.fundo_cor %}
+            <div>
+                <p class="text-sm text-gray-400">Fundo de Cor</p>
+                <p class="font-medium">{{ produto.fundo_cor }}</p>
+            </div>
+            {% endif %}
+            {% if produto.tonalidade %}
+            <div>
+                <p class="text-sm text-gray-400">Tonalidade</p>
+                <p class="font-medium">{{ produto.tonalidade }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if produto.detalhes or produto.ingredientes or produto.como_usar %}
+    <div class="mt-8">
+        <h2 class="text-xl font-bold mb-4 text-purple-400">Informações Adicionais</h2>
+        {% if produto.detalhes %}
+        <div class="mb-4">
+            <p class="text-sm text-gray-400 mb-2">Detalhes</p>
+            <p class="text-gray-300">{{ produto.detalhes }}</p>
+        </div>
+        {% endif %}
+        {% if produto.ingredientes %}
+        <div class="mb-4">
+            <p class="text-sm text-gray-400 mb-2">Ingredientes</p>
+            <p class="text-gray-300">{{ produto.ingredientes }}</p>
+        </div>
+        {% endif %}
+        {% if produto.como_usar %}
+        <div>
+            <p class="text-sm text-gray-400 mb-2">Como Usar</p>
+            <p class="text-gray-300">{{ produto.como_usar }}</p>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

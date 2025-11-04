@@ -1,0 +1,95 @@
+<div class="p-6 pb-20 md:pb-6">
+  <h1 class="text-3xl font-bold text-gray-800 mb-6">Alertas</h1>
+
+  <div *ngIf="loading" class="text-center py-12">
+    <p class="text-gray-500">Carregando alertas...</p>
+  </div>
+
+  <div *ngIf="!loading" class="space-y-6">
+    <div class="bg-white rounded-lg shadow">
+      <div class="p-6 border-b flex items-center justify-between">
+        <h2 class="text-xl font-semibold text-gray-800">Estoque Baixo</h2>
+        <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
+          {{ alertasEstoqueBaixo.length }} alertas
+        </span>
+      </div>
+      <div class="p-6">
+        <div *ngIf="alertasEstoqueBaixo.length > 0" class="space-y-4">
+          <div *ngFor="let produto of alertasEstoqueBaixo" class="flex items-center justify-between p-4 bg-red-50 rounded-lg border border-red-200">
+            <div class="flex-1">
+              <h3 class="font-semibold text-gray-800">{{ produto.nome }}</h3>
+              <p class="text-sm text-gray-600">SKU: {{ produto.sku }}</p>
+              <p class="text-sm text-gray-600">Marca: {{ produto.marca?.nome || '-' }}</p>
+            </div>
+            <div class="text-right">
+              <p class="text-red-600 font-bold text-lg">{{ produto.quantidade_estoque }} un.</p>
+              <p class="text-xs text-gray-500">Mínimo: {{ produto.estoque_minimo }}</p>
+              <a [routerLink]="['/produtos', produto.id]" class="text-blue-600 hover:text-blue-800 text-sm mt-2 inline-block">
+                Ver detalhes
+              </a>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="alertasEstoqueBaixo.length === 0" class="text-center py-8 text-gray-500">
+          Nenhum produto com estoque baixo
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow">
+      <div class="p-6 border-b flex items-center justify-between">
+        <h2 class="text-xl font-semibold text-gray-800">Próximos ao Vencimento</h2>
+        <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">
+          {{ alertasVencimento.length }} alertas
+        </span>
+      </div>
+      <div class="p-6">
+        <div *ngIf="alertasVencimento.length > 0" class="space-y-4">
+          <div *ngFor="let alerta of alertasVencimento" class="flex items-center justify-between p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+            <div class="flex-1">
+              <h3 class="font-semibold text-gray-800">{{ alerta.produto_nome }}</h3>
+              <p class="text-sm text-gray-600">Lote: {{ alerta.lote }}</p>
+              <p class="text-sm text-gray-600">Validade: {{ formatarData(alerta.validade) }}</p>
+            </div>
+            <div class="text-right">
+              <p class="text-yellow-600 font-bold">{{ calcularDiasParaVencimento(alerta.validade) }} dias</p>
+              <p class="text-xs text-gray-500">{{ alerta.quantidade }} unidades</p>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="alertasVencimento.length === 0" class="text-center py-8 text-gray-500">
+          Nenhum produto próximo ao vencimento
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow">
+      <div class="p-6 border-b flex items-center justify-between">
+        <h2 class="text-xl font-semibold text-gray-800">Sem Movimentação (90+ dias)</h2>
+        <span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">
+          {{ alertasSemMovimentacao.length }} alertas
+        </span>
+      </div>
+      <div class="p-6">
+        <div *ngIf="alertasSemMovimentacao.length > 0" class="space-y-4">
+          <div *ngFor="let produto of alertasSemMovimentacao" class="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <div class="flex-1">
+              <h3 class="font-semibold text-gray-800">{{ produto.nome }}</h3>
+              <p class="text-sm text-gray-600">SKU: {{ produto.sku }}</p>
+              <p class="text-sm text-gray-600">Marca: {{ produto.marca?.nome || '-' }}</p>
+            </div>
+            <div class="text-right">
+              <p class="text-gray-600 font-semibold">{{ produto.quantidade_estoque }} un.</p>
+              <a [routerLink]="['/produtos', produto.id]" class="text-blue-600 hover:text-blue-800 text-sm mt-2 inline-block">
+                Ver detalhes
+              </a>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="alertasSemMovimentacao.length === 0" class="text-center py-8 text-gray-500">
+          Todos os produtos têm movimentação recente
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

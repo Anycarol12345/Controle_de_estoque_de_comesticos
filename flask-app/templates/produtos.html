@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Produtos - Integra+ Estoque{% endblock %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold">Produtos</h1>
+    <a href="{{ url_for('produto_novo') }}" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg">
+        Novo Produto
+    </a>
+</div>
+
+<!-- Filtros -->
+<div class="bg-gray-800 rounded-lg p-4 mb-6 border border-gray-700">
+    <form method="GET" class="flex flex-col md:flex-row gap-4">
+        <input type="text" name="busca" value="{{ busca }}" placeholder="Buscar produto..." 
+               class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white">
+        <select name="marca" class="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white">
+            <option value="">Todas as marcas</option>
+            {% for marca in marcas %}
+            <option value="{{ marca.nome }}" {% if marca_filtro == marca.nome %}selected{% endif %}>
+                {{ marca.nome }}
+            </option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-lg">
+            Filtrar
+        </button>
+    </form>
+</div>
+
+<!-- Tabela de Produtos -->
+<div class="bg-gray-800 rounded-lg border border-gray-700 overflow-x-auto">
+    <table class="w-full">
+        <thead class="bg-gray-700">
+            <tr>
+                <th class="px-4 py-3 text-left">Produto</th>
+                <th class="px-4 py-3 text-left">SKU</th>
+                <th class="px-4 py-3 text-left">Marca</th>
+                <th class="px-4 py-3 text-left">Tipo</th>
+                <th class="px-4 py-3 text-right">Estoque</th>
+                <th class="px-4 py-3 text-right">Preço Venda</th>
+                <th class="px-4 py-3 text-right">Margem</th>
+                <th class="px-4 py-3 text-center">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for produto in produtos %}
+            <tr class="border-t border-gray-700 hover:bg-gray-700">
+                <td class="px-4 py-3">{{ produto.nome }}</td>
+                <td class="px-4 py-3 text-gray-400">{{ produto.sku }}</td>
+                <td class="px-4 py-3">{{ produto.marca.nome }}</td>
+                <td class="px-4 py-3">
+                    <span class="px-2 py-1 rounded text-xs bg-purple-900 text-purple-300">
+                        {{ produto.tipo_produto or 'N/A' }}
+                    </span>
+                </td>
+                <td class="px-4 py-3 text-right">
+                    <span class="{% if produto.quantidade_estoque <= produto.estoque_minimo %}text-red-400{% endif %}">
+                        {{ produto.quantidade_estoque }}
+                    </span>
+                </td>
+                <td class="px-4 py-3 text-right">R$ {{ "%.2f"|format(produto.preco_venda) }}</td>
+                <td class="px-4 py-3 text-right text-green-400">{{ "%.1f"|format(produto.margem_lucro) }}%</td>
+                <td class="px-4 py-3 text-center">
+                    <a href="{{ url_for('produto_detalhes', id=produto.id) }}" 
+                       class="text-purple-400 hover:text-purple-300 mr-3">Ver</a>
+                    <form method="POST" action="{{ url_for('produto_deletar', id=produto.id) }}" 
+                          class="inline" onsubmit="return confirm('Tem certeza?')">
+                        <button type="submit" class="text-red-400 hover:text-red-300">Deletar</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

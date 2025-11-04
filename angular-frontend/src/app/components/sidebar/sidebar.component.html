@@ -1,0 +1,30 @@
+<aside class="w-64 bg-white shadow-lg hidden md:block">
+  <div class="p-6">
+    <h1 class="text-2xl font-bold text-gray-800">Inventário</h1>
+  </div>
+  <nav class="mt-6">
+    <a
+      *ngFor="let item of menuItems"
+      [routerLink]="item.path"
+      routerLinkActive="bg-blue-50 text-blue-600 border-r-4 border-blue-600"
+      class="flex items-center px-6 py-3 text-gray-700 hover:bg-gray-50 transition-colors"
+    >
+      <span class="text-2xl mr-3">{{ item.icon }}</span>
+      <span class="font-medium">{{ item.label }}</span>
+    </a>
+  </nav>
+</aside>
+
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t z-50">
+  <div class="flex justify-around">
+    <a
+      *ngFor="let item of menuItems"
+      [routerLink]="item.path"
+      routerLinkActive="text-blue-600"
+      class="flex flex-col items-center py-2 px-3 text-gray-600 hover:text-blue-600"
+    >
+      <span class="text-xl">{{ item.icon }}</span>
+      <span class="text-xs mt-1">{{ item.label }}</span>
+    </a>
+  </div>
+</nav>
