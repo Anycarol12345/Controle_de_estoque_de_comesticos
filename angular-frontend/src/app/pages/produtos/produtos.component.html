@@ -1,0 +1,428 @@
+<div class="p-6 pb-20 md:pb-6">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold text-gray-800">Produtos</h1>
+    <button
+      (click)="abrirModal()"
+      class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+    >
+      Adicionar Produto
+    </button>
+  </div>
+
+  <div class="bg-white rounded-lg shadow mb-6 p-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <input
+        type="text"
+        [(ngModel)]="busca"
+        (ngModelChange)="filtrarProdutos()"
+        placeholder="Buscar por nome ou SKU..."
+        class="border rounded-lg px-4 py-2 w-full"
+      />
+      <select
+        [(ngModel)]="marcaSelecionada"
+        (ngModelChange)="filtrarProdutos()"
+        class="border rounded-lg px-4 py-2 w-full"
+      >
+        <option value="">Todas as marcas</option>
+        <option *ngFor="let marca of marcas" [value]="marca.id">
+          {{ marca.nome }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-lg shadow overflow-x-auto">
+    <table class="w-full">
+      <thead class="bg-gray-50 border-b">
+        <tr>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+          >
+            Nome
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+          >
+            SKU
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+          >
+            Marca
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+          >
+            Estoque
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+          >
+            Preço Venda
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+          >
+            Ações
+          </th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+        <tr *ngFor="let produto of produtosFiltrados" class="hover:bg-gray-50">
+          <td class="px-6 py-4">{{ produto.nome }}</td>
+          <td class="px-6 py-4">{{ produto.sku }}</td>
+          <td class="px-6 py-4">{{ getNomeMarca(produto.marca_id) }}</td>
+          <td class="px-6 py-4">
+            <span
+              [class]="
+                produto.quantidade_estoque <= produto.estoque_minimo
+                  ? 'text-red-600 font-semibold'
+                  : ''
+              "
+            >
+              {{ produto.quantidade_estoque }}
+            </span>
+          </td>
+          <td class="px-6 py-4">{{ formatarMoeda(produto.preco_venda) }}</td>
+          <td class="px-6 py-4">
+            <div class="flex gap-2">
+              <a
+                [routerLink]="['/produtos', produto.id]"
+                class="text-blue-600 hover:text-blue-800"
+                >Ver</a
+              >
+              <button
+                (click)="abrirModal(produto)"
+                class="text-green-600 hover:text-green-800"
+              >
+                Editar
+              </button>
+              <button
+                (click)="deletarProduto(produto.id!)"
+                class="text-red-600 hover:text-red-800"
+              >
+                Deletar
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div
+    *ngIf="mostrarModal"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+  >
+    <div
+      class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+    >
+      <div class="p-6 border-b">
+        <h2 class="text-2xl font-bold">
+          {{ produtoEditando ? "Editar Produto" : "Novo Produto" }}
+        </h2>
+      </div>
+      <div class="p-6">
+        <form (ngSubmit)="salvarProduto()" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Nome</label
+              >
+              <input
+                type="text"
+                [(ngModel)]="novoProduto.nome"
+                name="nome"
+                required
+                class="border rounded-lg px-4 py-2 w-full"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >SKU</label
+              >
+              <input
+                type="text"
+                [(ngModel)]="novoProduto.sku"
+                name="sku"
+                required
+                class="border rounded-lg px-4 py-2 w-full"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Marca</label
+              >
+              <select
+                [(ngModel)]="novoProduto.marca_id"
+                name="marca_id"
+                required
+                class="border rounded-lg px-4 py-2 w-full"
+              >
+                <option value="0">Selecione uma marca</option>
+                <option *ngFor="let marca of marcas" [value]="marca.id">
+                  {{ marca.nome }}
+                </option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Tipo de Produto</label
+              >
+              <select
+                [(ngModel)]="novoProduto.tipo_produto"
+                name="tipo_produto"
+                required
+                class="border rounded-lg px-4 py-2 w-full"
+              >
+                <option value="perfume">Perfume/Colônia</option>
+                <option value="creme">Creme</option>
+                <option value="maquiagem">Maquiagem</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Preço de Custo</label
+              >
+              <input
+                type="number"
+                [(ngModel)]="novoProduto.preco_custo"
+                name="preco_custo"
+                step="0.01"
+                required
+                class="border rounded-lg px-4 py-2 w-full"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Preço de Venda</label
+              >
+              <input
+                type="number"
+                [(ngModel)]="novoProduto.preco_venda"
+                name="preco_venda"
+                step="0.01"
+                required
+                class="border rounded-lg px-4 py-2 w-full"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Quantidade em Estoque</label
+              >
+              <input
+                type="number"
+                [(ngModel)]="novoProduto.quantidade_estoque"
+                name="quantidade_estoque"
+                required
+                class="border rounded-lg px-4 py-2 w-full"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Estoque Mínimo</label
+              >
+              <input
+                type="number"
+                [(ngModel)]="novoProduto.estoque_minimo"
+                name="estoque_minimo"
+                required
+                class="border rounded-lg px-4 py-2 w-full"
+              />
+            </div>
+          </div>
+
+          <div
+            *ngIf="novoProduto.tipo_produto === 'perfume'"
+            class="space-y-4 border-t pt-4"
+          >
+            <h3 class="font-semibold text-gray-700">Informações de Perfume</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Concentração</label
+                >
+                <input
+                  type="text"
+                  [(ngModel)]="novoProduto.concentracao"
+                  name="concentracao"
+                  class="border rounded-lg px-4 py-2 w-full"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Subfamílias</label
+                >
+                <input
+                  type="text"
+                  [(ngModel)]="novoProduto.subfamilias"
+                  name="subfamilias"
+                  class="border rounded-lg px-4 py-2 w-full"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Ocasião</label
+                >
+                <input
+                  type="text"
+                  [(ngModel)]="novoProduto.ocasiao"
+                  name="ocasiao"
+                  class="border rounded-lg px-4 py-2 w-full"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div
+            *ngIf="novoProduto.tipo_produto === 'creme'"
+            class="space-y-4 border-t pt-4"
+          >
+            <h3 class="font-semibold text-gray-700">Informações de Creme</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Tipo de Pele</label
+                >
+                <input
+                  type="text"
+                  [(ngModel)]="novoProduto.tipo_pele"
+                  name="tipo_pele"
+                  class="border rounded-lg px-4 py-2 w-full"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Propriedades</label
+                >
+                <input
+                  type="text"
+                  [(ngModel)]="novoProduto.propriedades"
+                  name="propriedades"
+                  class="border rounded-lg px-4 py-2 w-full"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Linha</label
+                >
+                <input
+                  type="text"
+                  [(ngModel)]="novoProduto.linha"
+                  name="linha"
+                  class="border rounded-lg px-4 py-2 w-full"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Ação/Resultado</label
+                >
+                <input
+                  type="text"
+                  [(ngModel)]="novoProduto.acao_resultado"
+                  name="acao_resultado"
+                  class="border rounded-lg px-4 py-2 w-full"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div
+            *ngIf="novoProduto.tipo_produto === 'maquiagem'"
+            class="space-y-4 border-t pt-4"
+          >
+            <h3 class="font-semibold text-gray-700">
+              Informações de Maquiagem
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Textura</label
+                >
+                <input
+                  type="text"
+                  [(ngModel)]="novoProduto.textura"
+                  name="textura"
+                  class="border rounded-lg px-4 py-2 w-full"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Cobertura</label
+                >
+                <input
+                  type="text"
+                  [(ngModel)]="novoProduto.cobertura"
+                  name="cobertura"
+                  class="border rounded-lg px-4 py-2 w-full"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Fundo de Cor</label
+                >
+                <input
+                  type="text"
+                  [(ngModel)]="novoProduto.fundo_cor"
+                  name="fundo_cor"
+                  class="border rounded-lg px-4 py-2 w-full"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                  >Tonalidade</label
+                >
+                <input
+                  type="text"
+                  [(ngModel)]="novoProduto.tonalidade"
+                  name="tonalidade"
+                  class="border rounded-lg px-4 py-2 w-full"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="border-t pt-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Ingredientes</label
+            >
+            <textarea
+              [(ngModel)]="novoProduto.ingredientes"
+              name="ingredientes"
+              rows="3"
+              class="border rounded-lg px-4 py-2 w-full"
+            ></textarea>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Como Usar</label
+            >
+            <textarea
+              [(ngModel)]="novoProduto.como_usar"
+              name="como_usar"
+              rows="3"
+              class="border rounded-lg px-4 py-2 w-full"
+            ></textarea>
+          </div>
+
+          <div class="flex justify-end gap-3 pt-4">
+            <button
+              type="button"
+              (click)="fecharModal()"
+              class="px-4 py-2 border rounded-lg hover:bg-gray-50"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+              Salvar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
