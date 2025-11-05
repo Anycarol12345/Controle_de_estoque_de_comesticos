@@ -145,20 +145,18 @@ def movimentacao_saida():
 
 @app.route('/relatorios')
 def relatorios():
-    # Vendas por marca
     vendas_marca = db.session.query(
         Marca.nome,
         db.func.sum(Movimentacao.quantidade).label('total')
-    ).join(Produto).join(Movimentacao).filter(
+    ).select_from(Marca).join(Produto).join(Movimentacao).filter(
         Movimentacao.tipo == 'saida'
     ).group_by(Marca.nome).all()
     
-    # Produtos mais vendidos
     produtos_vendidos = db.session.query(
         Produto.nome,
         Marca.nome.label('marca'),
         db.func.sum(Movimentacao.quantidade).label('total')
-    ).join(Marca).join(Movimentacao).filter(
+    ).select_from(Produto).join(Marca).join(Movimentacao).filter(
         Movimentacao.tipo == 'saida'
     ).group_by(Produto.id).order_by(db.desc('total')).limit(10).all()
     
