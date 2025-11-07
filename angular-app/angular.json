@@ -24,7 +24,28 @@
             "assets": ["src/favicon.ico", "src/assets"],
             "styles": ["src/styles.css"],
             "scripts": []
-          }
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all"
+            },
+            "development": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
+            }
+          },
+          "defaultConfiguration": "development"
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
@@ -32,6 +53,9 @@
             "buildTarget": "inventario-angular:build"
           },
           "configurations": {
+            "production": {
+              "buildTarget": "inventario-angular:build:production"
+            },
             "development": {
               "buildTarget": "inventario-angular:build:development"
             }
@@ -40,5 +64,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": "e16c6201-6539-4e4a-a868-d613dc0666dd"
   }
 }
