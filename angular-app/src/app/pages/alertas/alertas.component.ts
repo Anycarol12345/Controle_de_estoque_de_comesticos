@@ -1,7 +1,7 @@
 import { Component, type OnInit } from "@angular/core"
 import { CommonModule } from "@angular/common"
 import { RouterModule } from "@angular/router"
-import type { ApiService, Produto } from "../../services/api.service"
+import type { ApiService, Produto } from "../../service/api.service"
 
 @Component({
   selector: "app-alertas",
